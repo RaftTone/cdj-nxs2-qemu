@@ -36,6 +36,23 @@ reached HID mode. On Linux, drop `--monitor` to create a real HID device
 (`/dev/uhid`) that a Linux DJ app (e.g. Mixxx) can open; `--name` sets the product
 string the host matches the model on (default `CDJ-2000NXS2`).
 
+## Check the handshake without rekordbox
+
+`scripts/net/hid_handshake_host.py` plays the host side on the same relay (use it
+instead of the bridge, on the same port):
+
+```sh
+python3 scripts/net/hid_handshake_host.py          # prints every step, keeps the link alive
+```
+
+It answers the deck's announce, checks the HashA in the deck's reply against the
+recipe in the public CDJHidProtocol notes by Nikolaus Einhauser (swiftb0y), sends
+the reply and waits for the deck's `0x15` ack. If you write your own host, three
+things matter on the NXS2 model: the product string in the `0x14` reply must be the
+one your own `0x12` carried, a one-packet `0x14` uses fragment header index 1 and
+total 1, and the host has to keep sending (an all-zero report every 0.4 s is
+enough) from the `0x12` on, or the deck drops the handshake after about a second.
+
 ## Status
 
 | | |
